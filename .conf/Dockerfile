@@ -30,8 +30,7 @@
 
 # Step 1
 FROM alpine:3.21 as build-step
-# CVE-2025-49796: upgrade libxml2 to >=2.13.9-r0 (type confusion leads to DoS)
-RUN apk add --no-cache --upgrade libxml2
+RUN apk add --no-cache --upgrade libxml2 pcre2
 COPY public /public
 WORKDIR /public/assets
 RUN find . -type f | cut -c 3- | sort > index.txt
@@ -40,8 +39,7 @@ RUN find . -type f | cut -c 3- | sort > index.txt
 
 # Step 2
 FROM nginxinc/nginx-unprivileged:alpine
-# CVE-2025-49796: upgrade libxml2 to >=2.13.9-r0 (type confusion leads to DoS)
-RUN apk add --no-cache --upgrade libxml2
+RUN apk add --no-cache --upgrade pcre2 libxml2
 COPY .conf/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-step /public/assets /usr/share/nginx/html/assets
 COPY --from=build-step /public/documentation /usr/share/nginx/html/documentation
